@@ -12,8 +12,8 @@ BaselineOfGBAsteroid >> baseline: spec [
 	spec for: #common do: [
 
 		spec
-			baseline: 'WCGamebox'
+			baseline: 'Gamebox'
 			with: [ spec repository: 'github://mattonem/WCGamebox' ].
 
-		spec package: #GBAsteroid with: [ spec requires: #( WCGamebox ) ] ]
+		spec package: #GBAsteroid with: [ spec requires: #( Gamebox ) ] ]
 ]
