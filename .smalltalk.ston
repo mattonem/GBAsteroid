@@ -1,0 +1,19 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'GBAsteroid',
+      #directory : 'src', 
+      #platforms : [ #pharo ],
+      #load: [ 'tests', 'pharoJs' ]
+    }
+  ],
+  #postLoading : [
+    'scripts/exportApp.st'
+  ],
+  #testing : {
+    #failOnZeroTests : false,
+    #coverage : {
+      #categories : [ 'GBAsteroid', 'GBAsteroid-*' ]
+    }
+  }
+}
