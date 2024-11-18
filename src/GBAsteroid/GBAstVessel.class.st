@@ -114,7 +114,6 @@ GBAstVessel >> vesselFactory [
 			 do: [ :ev |
 				 | friction |
 				 friction := speed * (0.01 @ 0.01).
-
 				 newAngle := angle angle + (rotating * ev duration).
 				 speed := speed
 				          +

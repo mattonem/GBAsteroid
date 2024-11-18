@@ -6,7 +6,6 @@ Class {
 	#instVars : [
 		'clock',
 		'reference',
-		'model',
 		'root'
 	],
 	#classInstVars : [
@@ -76,7 +75,22 @@ AsteroidApp class >> generateHtmlUsing: html [
 								with: [
 									html idiomatic class: 'bi bi-pause'.
 									html idiomatic class: 'bi bi-slash'.
-									html idiomatic class: 'bi bi-play' ] ] ] ]
+									html idiomatic class: 'bi bi-play' ].
+							html div
+								class: 'text-start';
+								with: [
+									html paragraph with: [
+											html idiomatic class: 'bi bi-arrow-up-square'.
+											html text: ' accelerate' ].
+									html paragraph with: [
+											html idiomatic class: 'bi bi-arrow-left-square'.
+											html text: ' '.
+											html idiomatic class: 'bi bi-arrow-right-square'.
+											html text: ' turn' ].
+									html paragraph with: [
+											html image
+												style: 'max-height: 1.5em;';
+												url: 'https://www.svgrepo.com/show/309996/spacebar.svg'. html text: ' shoot' ] ] ] ] ]
 ]
 
 { #category : 'description' }
