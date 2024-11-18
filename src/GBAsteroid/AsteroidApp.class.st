@@ -194,7 +194,6 @@ AsteroidApp >> start [
 	| scene |
 	super start.
 	self initializeComponentHolder.
-	model := GameOfLife col: 30 row: 30.
 	(self componentNamed: #plotter) scene: (scene := self sceneFactory).
 	(document getElementById: #pause) addEventListener: #click block: [
 		clock started
