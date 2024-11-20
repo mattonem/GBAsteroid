@@ -118,7 +118,7 @@ AsteroidApp >> newAsteroid: aPosition [
 	pos := reference translation: aPosition.
 	pos addElement: (visual := GBNode new).
 	speed := Point r: 1 theta: (0 to: 1000) atRandom / 1000 * Float pi.
-	rotationSpeed := (0 to: 1000) atRandom / 80000.
+	rotationSpeed := (-500 to: 500) atRandom / 80000.
 	angle := visual rotation: (0 to: 1000) atRandom / 1000 * Float pi.
 	(pos translation: 1000 @ 0) addElement: visual.
 	(pos translation: -1000 @ 0) addElement: visual.
