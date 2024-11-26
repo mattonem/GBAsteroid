@@ -114,7 +114,7 @@ AsteroidApp >> asteroidShape [
 { #category : 'as yet unclassified' }
 AsteroidApp >> newAsteroid: aPosition [
 
-	| pos visual newPosition speed rotationSpeed angle newAngle |
+	| pos visual newPosition speed rotationSpeed angle newAngle poly |
 	pos := reference translation: aPosition.
 	pos addElement: (visual := GBNode new).
 	speed := Point r: 1 theta: (0 to: 1000) atRandom / 1000 * Float pi.
@@ -124,12 +124,12 @@ AsteroidApp >> newAsteroid: aPosition [
 	(pos translation: -1000 @ 0) addElement: visual.
 	(pos translation: 0 @ 1000) addElement: visual.
 	(pos translation: 0 @ -1000) addElement: visual.
-	angle addElement: (GBPolygon new
-			 points: self asteroidShape;
-			 color: nil;
-			 strokeStyle: 'white';
-			 lineWidth: 5;
-			 yourself).
+	angle addElement: (poly := GBPolygon new
+			         points: self asteroidShape;
+			         color: nil;
+			         strokeStyle: 'white';
+			         lineWidth: 5;
+			         yourself).
 	pos addElement: (GBScript new
 			 on: GBCalculate;
 			 do: [ :e |
@@ -147,7 +147,13 @@ AsteroidApp >> newAsteroid: aPosition [
 			 on: GBUpdate;
 			 do: [
 				 pos position: newPosition.
-				 angle angle: newAngle ])
+				 angle angle: newAngle ]).
+	pos addElement: (GBCollisionReference new
+			 identifier: #asteroid;
+			 shape: poly).
+	pos addElement: (GBScript new
+			 on: Shot;
+			 do: [ reference removeElement: pos ])
 ]
 
 { #category : 'as yet unclassified' }
@@ -169,6 +175,7 @@ AsteroidApp >> sceneFactory [
 
 	orchestrator := GBOchestrator new
 		                sequence: {
+				                GBCollisionDetection new.
 				                GBCalculate new.
 				                GBUpdate new.
 				                drawEvent };
@@ -177,7 +184,7 @@ AsteroidApp >> sceneFactory [
 	clock
 		requestedTps: 120;
 		waitUntilIsFinished: orchestrator.
-	root := GBNode new.
+	root := GBCollisionScope new.
 	root addElement: (reference := GBDrawingTranslation new
 			              position: 500 @ 500;
 			              yourself).

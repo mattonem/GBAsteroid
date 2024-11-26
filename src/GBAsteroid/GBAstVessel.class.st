@@ -54,7 +54,15 @@ GBAstVessel >> shootFrom: aPosition angle: anAngle [
 				 newPosition := shootPos position + (speed * e duration) ]).
 	shootPos addElement: (GBScript new
 			 on: GBUpdate;
-			 do: [ shootPos position: newPosition ])
+			 do: [ shootPos position: newPosition ]).
+	shootPos addElement: (GBCollisionReference new identifier: #bullet).
+	shootPos addElement: (GBCollision new
+			 points: { (0 @ 0) };
+			 lookfor: #asteroid;
+			 do: [ :aCollider |
+				 life := 0.
+				 aCollider announcer announce: Shot new ];
+			 yourself)
 ]
 
 { #category : 'adding' }
