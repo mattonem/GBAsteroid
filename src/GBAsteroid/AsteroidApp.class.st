@@ -115,15 +115,14 @@ AsteroidApp >> asteroidShape [
 AsteroidApp >> newAsteroid: aPosition [
 
 	| pos visual newPosition speed rotationSpeed angle newAngle poly |
-	pos := reference translation: aPosition.
+	pos := reference translation: aPosition - reference position.
 	pos addElement: (visual := GBNode new).
+	newPosition := pos position.
+
 	speed := Point r: 1 theta: (0 to: 1000) atRandom / 1000 * Float pi.
 	rotationSpeed := (-500 to: 500) atRandom / 80000.
 	angle := visual rotation: (0 to: 1000) atRandom / 1000 * Float pi.
-	(pos translation: 1000 @ 0) addElement: visual.
-	(pos translation: -1000 @ 0) addElement: visual.
-	(pos translation: 0 @ 1000) addElement: visual.
-	(pos translation: 0 @ -1000) addElement: visual.
+	newAngle := angle angle.
 	angle addElement: (poly := GBPolygon new
 			         points: self asteroidShape;
 			         color: nil;
@@ -134,15 +133,10 @@ AsteroidApp >> newAsteroid: aPosition [
 			 on: GBCalculate;
 			 do: [ :e |
 				 newPosition := pos position + (speed * e duration).
-				 newPosition x < -500 ifTrue: [
-						 newPosition := newPosition + (1000 @ 0) ].
-				 newPosition x > 500 ifTrue: [
-						 newPosition := newPosition - (1000 @ 0) ].
-				 newPosition y < -500 ifTrue: [
-						 newPosition := newPosition + (0 @ 1000) ].
-				 newPosition y > 500 ifTrue: [
-						 newPosition := newPosition - (0 @ 1000) ].
-				 newAngle := angle angle + (rotationSpeed * e duration) ]).
+				 newAngle := angle angle + (rotationSpeed * e duration).
+
+				 (newPosition + reference position) r > 2000 ifTrue: [
+						 reference removeElement: pos ] ]).
 	pos addElement: (GBScript new
 			 on: GBUpdate;
 			 do: [
@@ -159,10 +153,16 @@ AsteroidApp >> newAsteroid: aPosition [
 { #category : 'as yet unclassified' }
 AsteroidApp >> prepGame [
 
-	reference := root translation: 500 @ 500.
-	reference addElement: GBAstVessel new.
-	4 timesRepeat: [ :i |
-		self newAsteroid: (0 to: 1000) atRandom @ (0 to: 1000) atRandom ]
+	| vessel |
+	(root translation: 500 @ 500) addElement: (vessel := GBAstVessel new).
+	reference := vessel position.
+
+	root addElement: (GBScript new
+			 on: GBCalculate;
+			 do: [ :e |
+				 (1 to: 100 * e duration) atRandom < 5 ifTrue: [
+						 self newAsteroid:
+								 (Point r: 1000 theta: (0 to: 1000) atRandom / 500 * Float pi) ] ])
 ]
 
 { #category : 'as yet unclassified' }

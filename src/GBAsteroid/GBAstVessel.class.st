@@ -5,7 +5,8 @@ Class {
 		'position',
 		'angle',
 		'vesselPolygone',
-		'flames'
+		'flames',
+		'vesselSpeed'
 	],
 	#pools : [
 		'PjDomGlobals'
@@ -29,28 +30,29 @@ GBAstVessel >> initialize [
 ]
 
 { #category : 'adding' }
+GBAstVessel >> position [ 
+	^ position
+]
+
+{ #category : 'adding' }
 GBAstVessel >> shootFrom: aPosition angle: anAngle [
 
 	| shootPos visual speed newPosition life |
 	life := 50.
-	shootPos := self translation:
-		            aPosition
-		            + (0 @ -50 rotateBy: -1 * anAngle about: 0 @ 0).
+	shootPos := position translation:
+		            (0 @ -50 rotateBy: -1 * anAngle about: 0 @ 0)
+		            - position position.
 	shootPos addElement: (visual := GBNode new).
-	(shootPos translation: 1000 @ 0) addElement: visual.
-	(shootPos translation: -1000 @ 0) addElement: visual.
-	(shootPos translation: 0 @ 1000) addElement: visual.
-	(shootPos translation: 0 @ -1000) addElement: visual.
 	visual addElement: (GBCircle new
 			 color: 'white';
 			 radius: 5;
 			 yourself).
-	speed := 0 @ -8 rotateBy: -1 * anAngle about: 0 @ 0.
+	speed := (Point r: 8 theta: anAngle - (Float pi / 2)) + vesselSpeed.
 	shootPos addElement: (GBScript new
 			 on: GBCalculate;
 			 do: [ :e |
 				 life := life - e duration.
-				 life < 0 ifTrue: [ self removeElement: shootPos ].
+				 life < 0 ifTrue: [ position removeElement: shootPos ].
 				 newPosition := shootPos position + (speed * e duration) ]).
 	shootPos addElement: (GBScript new
 			 on: GBUpdate;
@@ -68,18 +70,14 @@ GBAstVessel >> shootFrom: aPosition angle: anAngle [
 { #category : 'adding' }
 GBAstVessel >> vesselFactory [
 
-	| newAngle newPosition rotating accelerating speed visualVessel |
+	| newAngle newPosition rotating accelerating  visualVessel |
 	position := self translation: 0 @ 0.
-	position addElement: (visualVessel := GBNode new).
+	self addElement: (visualVessel := GBNode new).
 	rotating := 0.
 	accelerating := 0 @ 0.
-	speed := 0 @ 0.
+	vesselSpeed := 0 @ 0.
 	angle := visualVessel rotation: 0.
 
-	(position translation: 1000 @ 0) addElement: visualVessel.
-	(position translation: -1000 @ 0) addElement: visualVessel.
-	(position translation: 0 @ 1000) addElement: visualVessel.
-	(position translation: 0 @ -1000) addElement: visualVessel.
 	angle addElement: (vesselPolygone := GBPolygon new
 			                   points: {
 					                   (0 @ -50).
@@ -99,7 +97,7 @@ GBAstVessel >> vesselFactory [
 			 on: GBKeyDown;
 			 do: [ :e |
 				 e evt code = 'Space' ifTrue: [
-						 self shootFrom: position position angle: angle angle ].
+						 self shootFrom: (0@0) angle: angle angle ].
 				 e evt code = 'ArrowUp' ifTrue: [
 						 angle addElement: flames.
 						 accelerating := 0 @ -0.5 ].
@@ -121,21 +119,14 @@ GBAstVessel >> vesselFactory [
 			 on: GBCalculate;
 			 do: [ :ev |
 				 | friction |
-				 friction := speed * (0.01 @ 0.01).
+				 friction := vesselSpeed * (0.01 @ 0.01).
 				 newAngle := angle angle + (rotating * ev duration).
-				 speed := speed
+				 vesselSpeed := vesselSpeed
 				          +
 					          ((accelerating rotateBy: -1 * angle angle about: 0 @ 0)
 					           * ev duration) - (friction * ev duration).
-				 newPosition := position position + (speed * ev duration).
-				 newPosition x < -500 ifTrue: [
-						 newPosition := newPosition + (1000 @ 0) ].
-				 newPosition x > 500 ifTrue: [
-						 newPosition := newPosition - (1000 @ 0) ].
-				 newPosition y < -500 ifTrue: [
-						 newPosition := newPosition + (0 @ 1000) ].
-				 newPosition y > 500 ifTrue: [
-						 newPosition := newPosition - (0 @ 1000) ] ]).
+				 newPosition := position position - (vesselSpeed * ev duration).
+				  ]).
 	self addElement: (GBScript new
 			 on: GBUpdate;
 			 do: [
