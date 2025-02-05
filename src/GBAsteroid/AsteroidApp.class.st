@@ -56,18 +56,25 @@ AsteroidApp class >> generateHtmlUsing: html [
 						class: 'card-body';
 						with: [
 							html div with: [
-									self addComponent: (WCGameBoxCanvas on: html) named: #plotter ].
+									self
+										addComponent: (WCGameBoxCanvas new
+												 width: 2000;
+												 height: 2000;
+												 widthStyle: '800px';
+												 heightStyle: '800px';
+												 on: html)
+										named: #plotter ].
 							html div with: [
-									html label
-										for: 'tps';
-										class: 'form-label';
-										with: 'TPS: '.
-									html inputRange
-										min: 1;
-										max: 240;
-										value: 120;
-										class: 'form-range';
-										id: 'tps' ].
+								html label
+									for: 'tps';
+									class: 'form-label';
+									with: 'TPS: '.
+								html inputRange
+									min: 1;
+									max: 240;
+									value: 120;
+									class: 'form-range';
+									id: 'tps' ].
 
 							html div
 								id: #pause;
@@ -90,7 +97,8 @@ AsteroidApp class >> generateHtmlUsing: html [
 									html paragraph with: [
 											html image
 												style: 'max-height: 1.5em;';
-												url: 'https://www.svgrepo.com/show/309996/spacebar.svg'. html text: ' shoot' ] ] ] ] ]
+												url: 'https://www.svgrepo.com/show/309996/spacebar.svg'.
+											html text: ' shoot' ] ] ] ] ]
 ]
 
 { #category : 'description' }
@@ -153,8 +161,10 @@ AsteroidApp >> newAsteroid: aPosition [
 { #category : 'as yet unclassified' }
 AsteroidApp >> prepGame [
 
-	| vessel |
-	(root translation: 500 @ 500) addElement: (vessel := GBAstVessel new).
+	| vessel plotter |
+	plotter := self componentNamed: #plotter.
+	(root translation: plotter width @ plotter height / 2) addElement:
+		(vessel := GBAstVessel new).
 	reference := vessel position.
 
 	root addElement: (GBScript new
@@ -168,11 +178,11 @@ AsteroidApp >> prepGame [
 { #category : 'as yet unclassified' }
 AsteroidApp >> sceneFactory [
 
-	| orchestrator drawEvent |
+	| orchestrator drawEvent plotter |
 	drawEvent := GBDrawFullClearSequenceStart new
 		             context: (self componentNamed: #plotter) context;
 		             yourself.
-
+	plotter := self componentNamed: #plotter.
 	orchestrator := GBOchestrator new
 		                sequence: {
 				                GBCollisionDetection new.
@@ -185,9 +195,7 @@ AsteroidApp >> sceneFactory [
 		requestedTps: 120;
 		waitUntilIsFinished: orchestrator.
 	root := GBCollisionScope new.
-	root addElement: (reference := GBDrawingTranslation new
-			              position: 500 @ 500;
-			              yourself).
+
 	root addElement: clock.
 	root addElement: orchestrator.
 	root addElement:
@@ -200,7 +208,7 @@ AsteroidApp >> sceneFactory [
 			 yourself).
 	root addElement: (GBRectangle new
 			 color: '#333333';
-			 corner: 1000 @ 1000;
+			 corner: plotter width @ plotter height;
 			 yourself).
 	self prepGame.
 	root addElement: GBDebugger new.
