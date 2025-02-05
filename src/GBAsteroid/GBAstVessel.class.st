@@ -35,6 +35,11 @@ GBAstVessel >> position [
 ]
 
 { #category : 'adding' }
+GBAstVessel >> power [ 
+	^ 0.1
+]
+
+{ #category : 'adding' }
 GBAstVessel >> shootFrom: aPosition angle: anAngle [
 
 	| shootPos visual speed newPosition life |
@@ -70,7 +75,7 @@ GBAstVessel >> shootFrom: aPosition angle: anAngle [
 { #category : 'adding' }
 GBAstVessel >> vesselFactory [
 
-	| newAngle newPosition rotating accelerating  visualVessel |
+	| newAngle newPosition rotating accelerating visualVessel |
 	position := self translation: 0 @ 0.
 	self addElement: (visualVessel := GBNode new).
 	rotating := 0.
@@ -97,10 +102,10 @@ GBAstVessel >> vesselFactory [
 			 on: GBKeyDown;
 			 do: [ :e |
 				 e evt code = 'Space' ifTrue: [
-						 self shootFrom: (0@0) angle: angle angle ].
+						 self shootFrom: 0 @ 0 angle: angle angle ].
 				 e evt code = 'ArrowUp' ifTrue: [
 						 angle addElement: flames.
-						 accelerating := 0 @ -0.5 ].
+						 accelerating := 0 @ (0 - self power) ].
 				 e evt code = 'ArrowLeft' ifTrue: [
 						 rotating := rotating + self angularSpeed ].
 				 e evt code = 'ArrowRight' ifTrue: [
@@ -122,11 +127,12 @@ GBAstVessel >> vesselFactory [
 				 friction := vesselSpeed * (0.01 @ 0.01).
 				 newAngle := angle angle + (rotating * ev duration).
 				 vesselSpeed := vesselSpeed
-				          +
-					          ((accelerating rotateBy: -1 * angle angle about: 0 @ 0)
-					           * ev duration) - (friction * ev duration).
-				 newPosition := position position - (vesselSpeed * ev duration).
-				  ]).
+				                +
+					                ((accelerating
+						                  rotateBy: -1 * angle angle
+						                  about: 0 @ 0) * ev duration)
+				                - (friction * ev duration).
+				 newPosition := position position - (vesselSpeed * ev duration) ]).
 	self addElement: (GBScript new
 			 on: GBUpdate;
 			 do: [

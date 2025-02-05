@@ -64,17 +64,6 @@ AsteroidApp class >> generateHtmlUsing: html [
 												 heightStyle: '800px';
 												 on: html)
 										named: #plotter ].
-							html div with: [
-								html label
-									for: 'tps';
-									class: 'form-label';
-									with: 'TPS: '.
-								html inputRange
-									min: 1;
-									max: 240;
-									value: 120;
-									class: 'form-range';
-									id: 'tps' ].
 
 							html div
 								id: #pause;
@@ -170,7 +159,7 @@ AsteroidApp >> prepGame [
 	root addElement: (GBScript new
 			 on: GBCalculate;
 			 do: [ :e |
-				 (1 to: 100 * e duration) atRandom < 5 ifTrue: [
+				 (0 to: 100 * e duration) atRandom < 1 ifTrue: [
 						 self newAsteroid:
 								 (Point r: 1000 theta: (0 to: 1000) atRandom / 500 * Float pi) ] ])
 ]
@@ -228,7 +217,4 @@ AsteroidApp >> start [
 		clock started
 			ifTrue: [ clock stop ]
 			ifFalse: [ clock start ] ].
-	(document getElementById: #tps)
-		addEventListener: #input
-		block: [ clock requestedTps: (document getElementById: #tps) value ]
 ]
